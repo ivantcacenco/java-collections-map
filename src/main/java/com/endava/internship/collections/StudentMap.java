@@ -20,13 +20,19 @@ public class StudentMap implements Map<Student, Integer> {
     }
 
     public StudentMap(final int capacity) {
-        this.buckets = new Pair[capacity];
+        if (capacity < 1) {
+            this.buckets = new Pair[INITIAL_CAPACITY];
+        } else if (1 == capacity % 2) {
+            this.buckets = new Pair[capacity+1];
+        } else {
+            this.buckets = new Pair[capacity];
+        }
     }
 
     static class Pair<K, V> {
         private final K key;
         private V value;
-        private final Pair<K, V> next;
+        private Pair<K, V> next;
 
         public Pair(final K key, final V value, final Pair<K, V> next) {
             this.key = key;
@@ -83,15 +89,13 @@ public class StudentMap implements Map<Student, Integer> {
         final var index = Math.abs(o.hashCode()) % buckets.length;
 
         var existing = buckets[index];
-        if (null == existing) {
-            return false;
-        } else {
+        if (null != existing) {
             do {
                 if (existing.key.equals(o)) {
                     return true;
                 }
                 existing = existing.next;
-            } while (null != existing.next);
+            } while (null != existing);
         }
         return false;
     }
@@ -145,14 +149,18 @@ public class StudentMap implements Map<Student, Integer> {
             buckets[index] = pair;
             size++;
         } else {
-            do {
+            while (null != existing) {
                 if (existing.key.equals(student)) {
                     final var oldValue = existing.getValue();
                     existing.value = integer;
                     return oldValue;
                 }
+                if (null == existing.next) {
+                    existing.next = pair;
+                    size++;
+                }
                 existing = existing.next;
-            } while (null != existing.next);
+            }
         }
         return null;
     }
@@ -196,7 +204,6 @@ public class StudentMap implements Map<Student, Integer> {
             }
             buckets[i] = null;
         }
-
     }
 
     @Override
@@ -228,7 +235,6 @@ public class StudentMap implements Map<Student, Integer> {
         public boolean remove(final Object key) {
             return StudentMap.this.remove(key) != null;
         }
-
     }
 
     @Override
@@ -255,7 +261,6 @@ public class StudentMap implements Map<Student, Integer> {
         public boolean contains(final Object o) {
             return containsValue(o);
         }
-
     }
 
     @Override
@@ -274,9 +279,7 @@ public class StudentMap implements Map<Student, Integer> {
             current = next = null;
             index = 0;
             if (pairs != null && size > 0) {
-                while (index < pairs.length && null == (next = pairs[index])) {
-                    index++;
-                }
+                do{} while (index < pairs.length && null == (next = pairs[index++]));
             }
         }
 
@@ -290,12 +293,10 @@ public class StudentMap implements Map<Student, Integer> {
             if (e == null) {
                 throw new NoSuchElementException();
             }
-            current = next;
-            next = current.next;
+            current = e;
+            next = e.next;
             if (null == next && null != pairs) {
-                while (index < pairs.length && null == (next = pairs[index])) {
-                    index++;
-                }
+               do{} while (index < pairs.length && null == (next = pairs[index++]));
             }
             return e;
         }
