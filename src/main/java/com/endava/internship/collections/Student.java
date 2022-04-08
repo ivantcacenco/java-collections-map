@@ -44,16 +44,16 @@ public class Student implements Comparable<Student> {
 
     @Override
     public int compareTo(Student o) {
-        if (!this.name.equals(o.name)) {
-            return this.dateOfBirth.compareTo(o.dateOfBirth);
+        if (this.name.equals(o.name)) {
+            return o.dateOfBirth.compareTo(this.dateOfBirth);
         }
-        return this.name.compareTo(o.name);
+        return o.name.compareTo(this.name);
     }
 
     @Override
     public String toString() {
-        return "\nName: " + name +
-                "\nDate of birth: " + dateOfBirth +
-                "\nDetails: " + details;
+        return "\nName: " + getName() +
+                "\nDate of birth: " + getDateOfBirth() +
+                "\nDetails: " + getDetails();
     }
 }
